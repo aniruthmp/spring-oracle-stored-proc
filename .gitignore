@@ -21,6 +21,7 @@
 ### NetBeans ###
 /nbproject/private/
 /build/
+/bin/
 /nbbuild/
 /dist/
 /nbdist/

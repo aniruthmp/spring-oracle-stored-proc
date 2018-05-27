@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -15,7 +15,18 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Employee {
+@NamedStoredProcedureQuery(
+        name = "addEmployeeThroughNamedStoredProcedureQuery",
+        procedureName = "EMPLOYEEPROCEDURE",
+        parameters = {
+                @StoredProcedureParameter(name = "FIRST_NAME", mode = ParameterMode.IN, type = String.class),
+                @StoredProcedureParameter(name = "LAST_NAME", mode = ParameterMode.IN, type = String.class),
+                @StoredProcedureParameter(name = "EMAIL", mode = ParameterMode.INOUT, type = String.class),
+                @StoredProcedureParameter(name = "ID", mode = ParameterMode.OUT, type = Integer.class),
+                @StoredProcedureParameter(name = "CREATED_AT", mode = ParameterMode.OUT, type = Date.class),
+        }
+)
+public class Employee implements Serializable {
     @Id
     private Integer id;
 

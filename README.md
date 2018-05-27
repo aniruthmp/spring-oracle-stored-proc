@@ -111,6 +111,32 @@ Irrespective of which way we choose, there are some key aspects/properties we sh
         }
     }
     ```
+1. Another way to is to use _@NamedStoredProcedureQuery_ inside our Entity class.
+
+    ```java
+    @NamedStoredProcedureQuery(
+            name = "addEmployeeThroughNamedStoredProcedureQuery",
+            procedureName = "EMPLOYEEPROCEDURE",
+            parameters = {
+                    @StoredProcedureParameter(name = "FIRST_NAME", mode = ParameterMode.IN, type = String.class),
+                    @StoredProcedureParameter(name = "LAST_NAME", mode = ParameterMode.IN, type = String.class),
+                    @StoredProcedureParameter(name = "EMAIL", mode = ParameterMode.INOUT, type = String.class),
+                    @StoredProcedureParameter(name = "ID", mode = ParameterMode.OUT, type = Integer.class),
+                    @StoredProcedureParameter(name = "CREATED_AT", mode = ParameterMode.OUT, type = Date.class),
+            }
+    )
+    public class Employee implements Serializable {
+        @Id
+        private Integer id;
+    
+        private String firstName;
+        private String lastName;
+        private String email;
+    
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
+        private Date createdAt;
+    }
+    ```
 
 ### Testing
 
@@ -120,3 +146,6 @@ Irrespective of which way we choose, there are some key aspects/properties we sh
 1. Perform a _PUT_ request to the endpoint `/null`. This inserts _NULL_ value to the _**EMPLOYEE.LAST_NAME**_ column ![SCREENSHOT](./docs/null.png)
 1. Perform a _GET_ request to the endpoint `/all` ![SCREENSHOT](./docs/all.png)
 1. Perform a _DELETE_ request to the endpoint `/remove/{id}` ![SCREENSHOT](./docs/remove.png)
+1. Perform a _PUT_ request to the endpoint `/named/procedure` ![SCREENSHOT](./docs/named.png)
+1. Perform a _PUT_ request to the endpoint `/named/null`. This inserts _NULL_ value to the _**EMPLOYEE.LAST_NAME**_ column ![SCREENSHOT](./docs/named-null.png)
+

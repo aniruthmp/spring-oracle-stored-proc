@@ -95,6 +95,64 @@ public class EmployeeController {
         }
     }
 
+    @PutMapping(path = "/named/procedure", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    Employee namedProcedureEmployee() {
+        log.info("Came inside namedProcedureEmployee");
+        Employee employee = generateEmployee();
+        ProcedureResult procedureResult = procedureRepository.addEmployeeThroughNamedStoredProcedureQuery(
+                employee.getFirstName(), employee.getLastName(), employee.getEmail());
+        employee.setId(procedureResult.getId());
+        employee.setEmail(procedureResult.getEmail());
+        employee.setCreatedAt(procedureResult.getCreatedAt());
+        log.info("Saved : " + employee.toString());
+        return employee;
+    }
+
+    @PutMapping(path = "/named/null", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    Employee namedProcedureNullValueEmployee() {
+        log.info("Came inside namedProcedureNullValueEmployee");
+        Employee employee = generateEmployee();
+        employee.setLastName(null);
+        ProcedureResult procedureResult = procedureRepository.addEmployeeThroughNamedStoredProcedureQuery(
+                employee.getFirstName(), employee.getLastName(), employee.getEmail());
+        employee.setId(procedureResult.getId());
+        employee.setEmail(procedureResult.getEmail());
+        employee.setCreatedAt(procedureResult.getCreatedAt());
+        log.info("Saved : " + employee.toString());
+        return employee;
+    }
+/*
+    @PutMapping(path = "/spring/procedure", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    Employee springProcedureEmployee() {
+        log.info("Came inside springProcedureEmployee");
+        Employee employee = generateEmployee();
+        ProcedureResult procedureResult = employeeRepository.addEmployeeThroughNamedStoredProcedureQuery(
+                employee.getFirstName(), employee.getLastName(), employee.getEmail());
+        employee.setId(procedureResult.getId());
+        employee.setEmail(procedureResult.getEmail());
+        employee.setCreatedAt(procedureResult.getCreatedAt());
+        log.info("Saved : " + employee.toString());
+        return employee;
+    }
+
+    @PutMapping(path = "/spring/null", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    Employee springProcedureNullValueEmployee() {
+        log.info("Came inside springProcedureNullValueEmployee");
+        Employee employee = generateEmployee();
+        employee.setLastName(null);
+        ProcedureResult procedureResult = employeeRepository.addEmployeeThroughNamedStoredProcedureQuery(
+                employee.getFirstName(), employee.getLastName(), employee.getEmail());
+        employee.setId(procedureResult.getId());
+        employee.setEmail(procedureResult.getEmail());
+        employee.setCreatedAt(procedureResult.getCreatedAt());
+        log.info("Saved : " + employee.toString());
+        return employee;
+    }
+*/
     private Employee generateEmployee() {
         Faker faker = new Faker();
         return Employee.builder()
