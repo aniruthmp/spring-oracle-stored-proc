@@ -27,9 +27,57 @@ Irrespective of which way we choose, there are some key aspects/properties we sh
           naming:
             physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
             implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-          proc.param_null_passing: true
+        properties:
+          hibernate:
+            proc.param_null_passing: true
         show-sql: true
         database-platform: org.hibernate.dialect.Oracle10gDialect
+    ```
+1. In scenarios where the database related beans are configured inside the Java class, refer below
+
+    ```java
+    @Configuration
+    @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class})
+    @EnableTransactionManagement
+    @EnableJpaRepositories(basePackages = {"io.pivotal.storedproc.repository"})
+    public class DBConfiguration {
+    
+        @Primary
+        @Bean
+        @ConfigurationProperties(prefix = "spring.datasource")
+        public DataSource dataSource() {
+            return DataSourceBuilder.create().build();
+        }
+    
+        @Primary
+        @Bean
+        LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    
+            HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+            vendorAdapter.setGenerateDdl(false);
+            vendorAdapter.setShowSql(true);
+    
+            LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+            factoryBean.setDataSource(dataSource());
+            factoryBean.setJpaVendorAdapter(vendorAdapter);
+            factoryBean.setPackagesToScan("io.pivotal.storedproc.domain");
+    
+            Properties jpaProperties = new Properties();
+            jpaProperties.put("hibernate.proc.param_null_passing", new Boolean(true));
+            jpaProperties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
+            jpaProperties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
+            factoryBean.setJpaProperties(jpaProperties);
+    
+            return factoryBean;
+        }
+    
+        @Primary
+        @Bean
+        public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+            return new JpaTransactionManager(entityManagerFactory);
+        }
+    }
     ```
 1. Inside our _@Repository_ class we can declare the stored procedure as follows. In th example below, we have all 3 parameter types i.e. _**IN**_, _**INOUT**_ and _**OUT**_
 
@@ -64,3 +112,11 @@ Irrespective of which way we choose, there are some key aspects/properties we sh
     }
     ```
 
+### Testing
+
+1. Perform a _PUT_ request to the endpoint `/add` ![SCREENSHOT](./docs/add.png)
+1. Perform a _PUT_ request to the endpoint `/random` ![SCREENSHOT](./docs/random.png)
+1. Perform a _PUT_ request to the endpoint `/procedure` ![SCREENSHOT](./docs/procedure.png)
+1. Perform a _PUT_ request to the endpoint `/null`. This inserts _NULL_ value to the _**EMPLOYEE.LAST_NAME**_ column ![SCREENSHOT](./docs/null.png)
+1. Perform a _GET_ request to the endpoint `/all` ![SCREENSHOT](./docs/all.png)
+1. Perform a _DELETE_ request to the endpoint `/remove/{id}` ![SCREENSHOT](./docs/remove.png)

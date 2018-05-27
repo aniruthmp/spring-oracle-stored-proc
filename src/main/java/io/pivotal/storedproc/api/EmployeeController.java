@@ -46,7 +46,7 @@ public class EmployeeController {
         return employee;
     }
 
-    @PutMapping(path = "/procedure", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/procedure", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     Employee procedureEmployee() {
         log.info("Came inside procedureEmployee");
@@ -60,7 +60,7 @@ public class EmployeeController {
         return employee;
     }
 
-    @PutMapping(path = "/null", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/null", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     Employee procedureNullValueEmployee() {
         log.info("Came inside procedureNullValueEmployee");

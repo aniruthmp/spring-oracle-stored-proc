@@ -11,7 +11,9 @@ spring:
       naming:
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-      proc.param_null_passing: true
+    properties:
+      hibernate:
+        proc.param_null_passing: true
     show-sql: true
     database-platform: org.hibernate.dialect.Oracle10gDialect
 
