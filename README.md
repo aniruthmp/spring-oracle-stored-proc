@@ -1,4 +1,4 @@
-# SpringBoot Demo Project for executing Oracle Stored Procedure
+# SpringBoot Demo Project for Executing Oracle Stored Procedure
 
 ### Pre-requisite
 - This requires Oracle DB. Follow this [article](https://medium.com/@brunoborges/setting-up-database-servers-for-development-on-mac-os-x-using-docker-b7f2fad056f3) to  spin an Oracle docker image. Alternatively, you can use the [docker-compose.yml](./src/main/docker/docker-compose.yml) 
@@ -137,9 +137,47 @@ Irrespective of which way we choose, there are some key aspects/properties we sh
         private Date createdAt;
     }
     ```
+1. Leveraging Functions can also be accomplished.  Inside our _@Repository_ class we can call the function as follows.
+    ```java
+    @Repository
+    public class FunctionRepository {
+    
+        @Autowired
+        JdbcTemplate jdbcTemplate;
+    
+        public FunctionResult addEmployeeThroughFunction(String firstName, String lastName, String email) {
+    
+            return jdbcTemplate.execute(
+                    (Connection c) -> {
+                        try {
+                            CallableStatement cs = c.prepareCall("{ ? = call EMPLOYEEFUNCTION(?, ?, ?, ?)}");
+                            cs.registerOutParameter(1, Types.INTEGER); // or whatever type your function returns.
+                            // Set your arguments
+                            cs.setString(2, firstName); // first argument
+                            cs.setString(3, lastName); // second argument
+                            cs.setString(4, email); // third argument
+                            cs.registerOutParameter(5, Types.DATE); // second OUT value
+                            return cs;
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    (CallableStatement cs) -> {
+                        cs.execute();
+                        return FunctionResult.builder()
+                                .id(cs.getInt(1))
+                                .email(email)
+                                .createdAt(cs.getDate(5))
+                                .build();
+                    }
+            );
+        }
+    }
+    ```
 
 ### Testing
-
+Launch the application and open the home page in a browser to learn more about the APIs, how to test them, and what they do.
+<!---
 1. Perform a _PUT_ request to the endpoint `/add` ![SCREENSHOT](./docs/add.png)
 1. Perform a _PUT_ request to the endpoint `/random` ![SCREENSHOT](./docs/random.png)
 1. Perform a _PUT_ request to the endpoint `/procedure` ![SCREENSHOT](./docs/procedure.png)
@@ -148,4 +186,4 @@ Irrespective of which way we choose, there are some key aspects/properties we sh
 1. Perform a _DELETE_ request to the endpoint `/remove/{id}` ![SCREENSHOT](./docs/remove.png)
 1. Perform a _PUT_ request to the endpoint `/named/procedure` ![SCREENSHOT](./docs/named.png)
 1. Perform a _PUT_ request to the endpoint `/named/null`. This inserts _NULL_ value to the _**EMPLOYEE.LAST_NAME**_ column ![SCREENSHOT](./docs/named-null.png)
-
+--->
